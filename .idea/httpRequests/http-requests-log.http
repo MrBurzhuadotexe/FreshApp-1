@@ -1,0 +1,27 @@
+GET http://www.thecocktaildb.com/api/json/v1/1/random.php
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+<> 2025-06-29T040009.200.json
+
+###
+
+GET http://www.thecocktaildb.com/api/json/v1/1/random.php
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+<> 2025-06-29T040001.200.json
+
+###
+
+GET http://www.thecocktaildb.com/api/json/v1/1/random.php
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+<> 2025-06-29T032958.200.json
+
+###
+
