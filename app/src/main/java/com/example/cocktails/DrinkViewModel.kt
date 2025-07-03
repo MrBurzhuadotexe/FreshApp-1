@@ -33,7 +33,40 @@ class DrinkViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     init {
-        loadRandomMeals()
+        loadPopularDrinks(listOf(
+            "178325",
+            "11113",
+            "11117",
+            "11288",
+            "17211",
+            "11006",
+            "11007",
+            "11728",
+            "11000",
+            "11003",
+            "11001",
+            "17207",
+            "13621",
+            "11004"
+        )
+        )
+    }
+
+    fun loadPopularDrinks(ids: List<String>) {
+        viewModelScope.launch {
+            val specificDrinks = mutableListOf<Drink>()
+            ids.forEach { id ->
+                try {
+                    val response = api.getMealById(id) // Fetch the drink by its ID
+                    response.drinks?.firstOrNull()?.let { // Check for null "drinks" and extract the first drink
+                        specificDrinks.add(it.convert()) // Convert DTO to Drink
+                    }
+                } catch (e: Exception) {
+                    println("API error fetching drink with ID ($id): ${e.message}")
+                }
+            }
+            _drinks.value = specificDrinks // Update state with collected drinks
+        }
     }
 
     fun loadRandomMeals(count: Int = 10) {
@@ -42,7 +75,6 @@ class DrinkViewModel(application: Application) : AndroidViewModel(application) {
             repeat(count) {
                 try {
                     val response = api.getRandomMeal()
-                    println(response.toString())
                     response.drinks?.firstOrNull()?.let { // Check for null "drinks" and take the first drink if available
                         randoms.add(it.convert())
                     }

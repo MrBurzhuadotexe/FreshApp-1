@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -31,7 +32,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = view
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopBar(title = "Rejestracja", isMainScreen = false) {
+            TopBar(title = "Sign in", isMainScreen = false) {
                 navController.navigate("main?message=") {
                     popUpTo("main?message=") { inclusive = true }
                 }
@@ -51,9 +52,8 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = view
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "Rejestracja",
+                    "Sign in",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
 
@@ -74,7 +74,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = view
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Hasło") },
+                    label = { Text("Password") },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -89,7 +89,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = view
                 OutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
-                    label = { Text("Powtórz hasło") },
+                    label = { Text("Password") },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -104,7 +104,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = view
                 Button(
                     onClick = {
                         if (password != confirmPassword) {
-                            viewModel.loginMessage.value = "Hasła nie są identyczne"
+                            viewModel.loginMessage.value = "Passwords do not match!"
                             viewModel.showSnackbar.value = true
                         } else {
                             viewModel.register(email, password) {
@@ -120,11 +120,11 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel = view
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    Text("Zarejestruj się")
+                    Text("Create account")
                 }
 
                 TextButton(onClick = { navController.navigate("login") }) {
-                    Text("Masz już konto? Zaloguj się", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                    Text("Already have an account? Log in!", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                 }
             }
         }

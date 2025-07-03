@@ -33,7 +33,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = viewMod
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopBar(title = "Szczegóły", isMainScreen = false) {
+            TopBar(title = "Details", isMainScreen = false) {
                 navController.navigate("main?message=") {
                     popUpTo("main?message=") { inclusive = true }
                 }
@@ -54,9 +54,8 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = viewMod
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "Zaloguj się",
+                    "Log in",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color(0xFFFF9800)
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -65,16 +64,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = viewMod
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        cursorColor = MaterialTheme.colorScheme.primary,
-                        focusedLabelColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                    )
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -82,18 +72,9 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = viewMod
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Hasło") },
+                    label = { Text("Password") },
                     modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation(),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        cursorColor = MaterialTheme.colorScheme.primary,
-                        focusedLabelColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                    )
+                    visualTransformation = PasswordVisualTransformation()
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -107,16 +88,12 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel = viewMod
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFF9800),
-                        contentColor = Color.Black
-                    )
                 ) {
-                    Text("Zaloguj się")
+                    Text("Log in")
                 }
 
                 TextButton(onClick = { navController.navigate("register") }) {
-                    Text("Nie masz konta? Zarejestruj się", color = Color.Gray)
+                    Text("Don't have an account? Sign in!", color = Color.Gray)
                 }
             }
         }

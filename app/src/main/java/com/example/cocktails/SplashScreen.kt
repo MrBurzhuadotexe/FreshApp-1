@@ -6,13 +6,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
-import com.example.cocktails.ui.theme.BlackBackground
+import com.example.cocktails.ui.theme.whiteBackground
 import kotlinx.coroutines.delay
 
 @Composable
@@ -29,7 +28,7 @@ fun SplashScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BlackBackground),
+            .background(whiteBackground),
         contentAlignment = Alignment.Center
     ) {
         // Use Coil's AsyncImage composable to display the GIF

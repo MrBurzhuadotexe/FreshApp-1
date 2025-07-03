@@ -25,6 +25,14 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.unit.Dp
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +60,7 @@ fun MainScreen(
     var lastClickTime by remember { mutableStateOf(0L) }
     val drawerEnabled = remember { mutableStateOf(false) }
 
+
     LaunchedEffect(Unit) {
         delay(300)
         drawerEnabled.value = true
@@ -76,7 +85,8 @@ fun MainScreen(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                modifier = Modifier.width(screenWidth * 0.4f)
+                modifier = Modifier.width(screenWidth * 0.8f),
+                drawerContainerColor = Color(0xFFCFD9F9)
             ) {
                 Column(
                     modifier = Modifier
@@ -84,18 +94,23 @@ fun MainScreen(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
+                    Spacer(modifier = Modifier.height(15.dp))
                     Divider()
 
-                    DrawerItem("Wszystkie", Icons.Default.List) {
+                    DrawerItem("Catalogue", Icons.Default.MenuBook) {
                         selectedScreen = "Wszystkie"
                         coroutineScope.launch { drawerState.close() }
                     }
-                    DrawerItem("Ulubione", Icons.Default.Favorite) {
+                    DrawerItem("Favorite", Icons.Default.Star) {
                         navController.navigate("favorites")
                         coroutineScope.launch { drawerState.close() }
                     }
-                    DrawerItem("Zapisane", Icons.Default.Save) {
+                    DrawerItem("Saved", Icons.Default.Bookmark) {
                         navController.navigate("offline")
+                        coroutineScope.launch { drawerState.close() }
+                    }
+                    DrawerItem("Settings", Icons.Default.Settings) {
+                        navController.navigate("settings")
                         coroutineScope.launch { drawerState.close() }
                     }
 
@@ -104,7 +119,7 @@ fun MainScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     if (isLoggedIn) {
-                        DrawerItem("Wyloguj się", Icons.Default.Logout) {
+                        DrawerItem("Log out", Icons.Default.Logout) {
                             authViewModel.logout {
                                 navController.navigate("login") {
                                     popUpTo("main?message={message}") { inclusive = true }
@@ -112,9 +127,13 @@ fun MainScreen(
                             }
                         }
                     } else {
-                        DrawerItem("Zaloguj się", Icons.Default.Person) {
+                        DrawerItem("Log in", Icons.Default.Person) {
                             navController.navigate("login")
                         }
+                    }
+                    DrawerItem("Help", Icons.Default.Help) {
+                        navController.navigate("help")
+                        coroutineScope.launch { drawerState.close() }
                     }
                 }
             }
@@ -123,21 +142,23 @@ fun MainScreen(
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
-                TopBar(
-                    title = "Catalogue",
-                    isMainScreen = true,
-                    onNavigationClick = {
-                        val now = System.currentTimeMillis()
-                        if (now - lastClickTime > 500 && drawerEnabled.value) {
-                            lastClickTime = now
-                            coroutineScope.launch {
-                                if (!drawerState.isOpen) {
-                                    drawerState.open()
+                Column {
+                    TopBar(
+                        title = "Catalogue",
+                        isMainScreen = true,
+                        onNavigationClick = {
+                            val now = System.currentTimeMillis()
+                            if (now - lastClickTime > 500 && drawerEnabled.value) {
+                                lastClickTime = now
+                                coroutineScope.launch {
+                                    if (!drawerState.isOpen) {
+                                        drawerState.open()
+                                    }
                                 }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
         ) { padding ->
             Column(
@@ -145,18 +166,6 @@ fun MainScreen(
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                OutlinedTextField(
-                    value = search,
-                    onValueChange = {
-                        search = it
-                        if (it.isEmpty()) drinkViewModel.loadRandomMeals()
-                        else drinkViewModel.search(it)
-                    },
-                    label = { Text("Search") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                )
 
                 when (selectedScreen) {
                     "Wszystkie" -> {
@@ -175,7 +184,95 @@ fun MainScreen(
                             }
                         } else offlineMeals
 
-                        MealList(displayMeals, navController)
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(10.dp), // Space between items
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(10.dp) // Padding around the list
+                        ) {
+                            // Search bar as the first item in the scrollable list
+                            item {
+                                OutlinedTextField(
+                                    value = search,
+                                    onValueChange = {
+                                        search = it
+                                        if (it.isEmpty()) drinkViewModel.loadPopularDrinks(listOf(
+                                            "178325",
+                                            "11113",
+                                            "11117",
+                                            "11288",
+                                            "17211",
+                                            "11006",
+                                            "11007",
+                                            "11728",
+                                            "11000",
+                                            "11003",
+                                            "11001",
+                                            "17207",
+                                            "13621",
+                                            "11004"
+                                        ))
+                                        else drinkViewModel.search(it)
+                                    },
+                                    label = { Text("Search") },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp)
+                                        .padding(bottom = 8.dp), // Add bottom padding for spacing with cards/group below
+                                    shape = RoundedCornerShape(32.dp), // Rounded borders
+
+                                )
+                            }
+
+                            // Cards displayed below the search bar
+                            items(displayMeals) { meal ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            navController.navigate("details/${meal.id}")
+                                        },
+                                    elevation = CardDefaults.cardElevation(
+                                        defaultElevation = 8.dp
+                                    ),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color.White
+                                    ),
+                                    shape = androidx.compose.foundation.shape.RoundedCornerShape(32.dp), // Rounded corners
+                                    border = BorderStroke(1.dp, Color.Black)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp), // Padding inside each item
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        val context = LocalContext.current
+                                        val resourceName = meal.name.lowercase().replace(" ", "_")
+                                        val resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+                                        AsyncImage(
+                                            model = resourceId,
+                                            contentDescription = meal.name,
+                                            placeholder = painterResource(R.drawable.cocktail_icon),
+                                            error = painterResource(R.drawable.cocktail_icon),
+                                            modifier = Modifier
+                                                .size(60.dp)
+                                        )
+                                        Column(
+                                            modifier = Modifier
+                                                .weight(10f)
+                                                .padding(start = 8.dp)
+                                        ) {
+                                            Text(
+                                                text = meal.name,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                color = MaterialTheme.colorScheme.onBackground
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     "Ulubione" -> MealList(favoriteMeals, navController)
                     "Zapisane" -> MealList(offlineMeals, navController)
@@ -209,50 +306,54 @@ fun DrawerItem(label: String, icon: ImageVector, onClick: () -> Unit) {
 
 @Composable
 fun MealList(meals: List<DrinkEntity>, navController: NavController) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2), // Adjust the number of columns as needed
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(8.dp) // Add padding around the grid
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(10.dp), // Add spacing between items
+        modifier = Modifier.padding(10.dp) // Add padding around the list
     ) {
         items(meals) { meal ->
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1f) // Ensures square cards
                     .clickable {
                         navController.navigate("details/${meal.id}")
                     },
-                elevation = CardDefaults.cardElevation(4.dp),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 8.dp
+                ),
                 colors = CardDefaults.cardColors(
                     containerColor = Color.White
-                )
+                ),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(32.dp), // Rounded corners
+                border = BorderStroke(1.dp, Color.Black) // Black border with 2.dp stroke
             ) {
-                Column(
+                Row(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                        .fillMaxWidth()
+                        .padding(8.dp), // Padding inside each item
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     val context = LocalContext.current
-					val resourceName = meal.name.lowercase().replace(" ", "_")
-					val resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+                    val resourceName = meal.name.lowercase().replace(" ", "_")
+                    val resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
                     AsyncImage(
                         model = resourceId,
                         contentDescription = meal.name,
                         placeholder = painterResource(R.drawable.cocktail_icon),
                         error = painterResource(R.drawable.cocktail_icon),
                         modifier = Modifier
-                            .size(100.dp) // Thumbnail size
+                            .size(60.dp)
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = meal.name,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        maxLines = 1 // Truncate long names
-                    )
+                    Column(
+                        modifier = Modifier
+                            .weight(10f)
+                            .padding(start = 8.dp) // Padding between the image and the text
+                    ) {
+                        Text(
+                            text = meal.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
                 }
             }
         }

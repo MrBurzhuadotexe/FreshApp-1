@@ -14,15 +14,26 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.*
+import androidx.compose.material3.Divider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.Star
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,17 +75,17 @@ fun RecipeDetailScreen(
 
         Scaffold(
             topBar = {
-                TopBar(title = "Szczegóły", isMainScreen = false) {
+                TopBar(title = "Szczegóły", isMainScreen = false){
                     navController.navigate("main?message=") {
                         popUpTo("main?message=") { inclusive = true }
                     }
                 }
             }
+
         ) { padding ->
             Column(
                 modifier = Modifier
                     .padding(padding)
-                    .padding(16.dp)
                     .fillMaxSize()
                     .verticalScroll(scrollState)
             ) {
@@ -82,11 +93,13 @@ fun RecipeDetailScreen(
                 Image(
                     painter = rememberAsyncImagePainter(it.thumb),
                     contentDescription = it.name,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(0.5f)
+                        .heightIn(min = 200.dp)
 
                 )
+                Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -109,11 +122,11 @@ fun RecipeDetailScreen(
                                     }
                                 }
                             } else {
-                                Toast.makeText(context, "Zaloguj się, aby dodać do ulubionych", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "This action requires authentification", Toast.LENGTH_SHORT).show()
                             }
                         }) {
                             Icon(
-                                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
                                 contentDescription = "Ulubione"
                             )
                         }
@@ -129,43 +142,73 @@ fun RecipeDetailScreen(
                                     isOffline = !isOffline
                                 }
                             } else {
-                                Toast.makeText(context, "Zaloguj się, aby zapisać przepis offline", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "This action requires authentification", Toast.LENGTH_SHORT).show()
                             }
                         }) {
                             Icon(
-                                imageVector = if (isOffline) Icons.Filled.Save else Icons.Outlined.Save,
+                                imageVector = if (isOffline) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                                 contentDescription = "Zapisane"
                             )
                         }
                     }
                 }
 
-                Text(
-                    text = "Ingredients:",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+                // Ingredients Card
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFF493B2) // Ingredients card color
+                    ),
+                    border = BorderStroke(width = 1.dp, color = Color.Black) // Black border
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Ingredients:",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
 
-                it.ingredients.forEach { (ingredient, measure) ->
-                    Text(
-                        text = "• $ingredient - $measure",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
+                        it.ingredients.forEach { (ingredient, measure) ->
+                            Text(
+                                text = "• $ingredient - $measure",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        }
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                // Instructions Card
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFB2F493) // Instructions card color
+                    ),
+                    border = BorderStroke(width = 1.dp, color = Color.Black) // Black border
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Instructions:",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
 
-                Text(
-                    text = "Instructions:",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Text(
-                    it.strInstructions ?: "Brak instrukcji",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                        Text(
+                            it.strInstructions ?: "No instructions available",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -173,16 +216,16 @@ fun RecipeDetailScreen(
                     onClick = { showDialog = true },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
-                    Text("Wyślij składniki SMS")
+                    Text("Send SMS with ingredients")
                 }
 
                 if (showDialog) {
                     AlertDialog(
                         onDismissRequest = { showDialog = false },
-                        title = { Text("Wyślij SMS") },
+                        title = { Text("Send SMS") },
                         text = {
                             Column {
-                                Text("Podaj numer telefonu:")
+                                Text("Enter your phone number: ")
                                 OutlinedTextField(
                                     value = phoneNumber,
                                     onValueChange = { phoneNumber = it },
@@ -198,12 +241,12 @@ fun RecipeDetailScreen(
                                 sendSms(context, phoneNumber, smsBody)
                                 showDialog = false
                             }) {
-                                Text("Wyślij")
+                                Text("Send")
                             }
                         },
                         dismissButton = {
                             TextButton(onClick = { showDialog = false }) {
-                                Text("Anuluj")
+                                Text("Decline")
                             }
                         }
                     )
@@ -223,7 +266,7 @@ fun sendSms(context: Context, phoneNumber: String, body: String) {
         putExtra("sms_body", body)
     }
     if (intent.resolveActivity(context.packageManager) != null) {
-        Toast.makeText(context, "Otwieranie aplikacji SMS", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Opening SMS", Toast.LENGTH_SHORT).show()
         context.startActivity(intent)
     }
 }

@@ -33,13 +33,13 @@ class DrinkRepository(
             isOffline = true,
             userId = userId
         )
-        drinkInterface.insertMeal(entity)
+        drinkInterface.add_drink(entity)
     }
 
     suspend fun setFavorite(id: String, isFavorite: Boolean, userId: String) {
         drinkInterface.setFavorite(id, isFavorite, userId)
         if (isFavorite) {
-            val meal = drinkInterface.getMealById(id, userId)
+            val meal = drinkInterface.fetch_by_id(id, userId)
             if (meal != null && !meal.isOffline) {
                 drinkInterface.setOffline(id, true, userId)
             }
@@ -50,9 +50,9 @@ class DrinkRepository(
         drinkInterface.setOffline(id, isOffline, userId)
     }
 
-    suspend fun getFavoriteMeals(userId: String) = drinkInterface.getFavoriteMeals(userId)
+    suspend fun getFavoriteMeals(userId: String) = drinkInterface.fetch_liked_drinks(userId)
 
-    suspend fun getOfflineMeals(userId: String) = drinkInterface.getOfflineMeals(userId)
+    suspend fun getOfflineMeals(userId: String) = drinkInterface.fetch_saved_drinks(userId)
 
-    suspend fun getMealById(id: String, userId: String) = drinkInterface.getMealById(id, userId)
+    suspend fun getMealById(id: String, userId: String) = drinkInterface.fetch_by_id(id, userId)
 }
